@@ -1,10 +1,3 @@
-//
-//  BookshelfView.swift
-//  iFind_App
-//
-//  Created by Josiah Green on 10/16/25.
-//
-
 import SwiftUI
 
 struct BookshelfView: View {
@@ -15,32 +8,25 @@ struct BookshelfView: View {
 
     var body: some View {
         if openBook {
-            // Placeholder BookView for now
             BookView()
                 .ignoresSafeArea()
                 .transaction { $0.animation = nil }
         } else {
             ZStack {
-                // Background wallpaper (kept as in your version)
                 Image("bookshelfView_container")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
 
-                // Horizontal scroll for book cards
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 36) {
-                        // Unlocked book — Animals
                         BookshelfCard(
                             title: "Animals",
                             imageName: "animals_container",
                             isLocked: false
                         )
-                        .onTapGesture {
-                            withAnimation(.none) { openBook = true }
-                        }
+                        .onTapGesture { withAnimation(.none) { openBook = true } }
 
-                        // Locked placeholders
                         BookshelfCard(
                             title: "Coming Soon",
                             imageName: "bookshelfView_wallpaper",
@@ -53,23 +39,19 @@ struct BookshelfView: View {
                             isLocked: true
                         )
                     }
-                    // Your adjusted padding (unchanged)
                     .padding(.leading, 124)
                     .padding(.trailing, 40)
                     .padding(.top, 72)
                     .padding(.bottom, 24)
                 }
 
-                // Top-right: Slide-to-Home button (replaces back chevron)
                 VStack {
                     HStack {
                         Spacer()
-                        SlideToHomeButton {
-                            goBack() // return to previous screen (Dashboard)
-                        }
-                        .frame(width: 180)
-                        .padding(.trailing, 32)
-                        .padding(.top, 12)
+                        SlideToHomeButton { goBack() }
+                            .frame(width: 180)
+                            .padding(.trailing, 32)
+                            .padding(.top, 12)
                     }
                     Spacer()
                 }
@@ -82,7 +64,6 @@ struct BookshelfView: View {
     }
 }
 
-// MARK: - Card
 private struct BookshelfCard: View {
     let title: String
     let imageName: String
@@ -90,66 +71,59 @@ private struct BookshelfCard: View {
 
     private let size = CGSize(width: 280, height: 220)
     private let corner: CGFloat = 5
-    private let borderWidth: CGFloat = 12
+    private let borderWidth: CGFloat = 24
+    private let badgeHeight: CGFloat = 32
 
     var body: some View {
-        ZStack {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: size.width, height: size.height)
-                .clipped()
-                .cornerRadius(corner)
-                .overlay(
-                    RoundedRectangle(cornerRadius: corner)
-                        .stroke(.black, lineWidth: borderWidth)
-                )
-                .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                .clipShape(RoundedRectangle(cornerRadius: corner))
-                .overlay(lockedOverlay)
+        VStack(spacing: 8) {
+            if isLocked {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill").font(.title2.bold())
+                    Text("Locked").font(.headline.weight(.semibold))
+                }
+                .foregroundStyle(.white)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 10)
+                .background(.black.opacity(0.6), in: Capsule())
+                .shadow(radius: 4, y: 2)
+            } else {
+                Color.clear.frame(height: badgeHeight)
+            }
 
-            Text(title)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundStyle(.black)
-                .shadow(radius: 2)
-                .padding(.bottom, 10)
-                .frame(maxHeight: .infinity, alignment: .top)
+            ZStack {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size.width, height: size.height)
+                    .clipped()
+                    .overlay {
+                        if isLocked {
+                            RoundedRectangle(cornerRadius: corner)
+                                .fill(Color.black.opacity(0.35))
+                        }
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: corner)
+                            .stroke(.black, lineWidth: borderWidth)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: corner))
+                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+
+                VStack {
+                    Spacer().frame(height: size.height / 3.0)
+                    Text(title)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(isLocked ? .white : .black)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+                .frame(width: size.width, height: size.height, alignment: .top)
+            }
         }
         .contentShape(RoundedRectangle(cornerRadius: corner))
     }
-
-    @ViewBuilder
-    private var lockedOverlay: some View {
-        if isLocked {
-            RoundedRectangle(cornerRadius: corner)
-                .fill(Color.black.opacity(0.35))
-
-            HStack(spacing: 8) {
-                Image(systemName: "lock.fill").font(.title2.bold())
-                Text("Locked").font(.headline.weight(.semibold))
-            }
-            .foregroundStyle(.white)
-            .padding(10)
-            .background(.black.opacity(0.6), in: Capsule())
-        } else {
-            EmptyView()
-        }
-    }
 }
 
-// MARK: - Placeholder BookView
-struct BookView: View {
-    var body: some View {
-        ZStack {
-            Color.orange.ignoresSafeArea()
-            Text("Book View (Placeholder)")
-                .font(.largeTitle).bold()
-                .foregroundStyle(.white)
-        }
-    }
-}
-
-// MARK: - Preview
 #Preview("BookshelfView – Landscape", traits: .landscapeLeft) {
     BookshelfView()
 }

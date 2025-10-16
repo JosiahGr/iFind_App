@@ -18,6 +18,8 @@
 		3329C20C2EA04C090067666E /* ParentAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3329C20B2EA04C090067666E /* ParentAuthView.swift */; };
 		3329C20E2EA04C160067666E /* BookshelfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3329C20D2EA04C160067666E /* BookshelfView.swift */; };
 		334864632EA16098006A9391 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 334864622EA16094006A9391 /* SettingsView.swift */; };
+		33DC3B002EA18F06001F6C27 /* BookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DC3AFF2EA18F03001F6C27 /* BookView.swift */; };
+		33DC3B052EA18FB5001F6C27 /* PurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DC3B042EA18FB2001F6C27 /* PurchaseView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +54,8 @@
 		3329C20B2EA04C090067666E /* ParentAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentAuthView.swift; sourceTree = "<group>"; };
 		3329C20D2EA04C160067666E /* BookshelfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookshelfView.swift; sourceTree = "<group>"; };
 		334864622EA16094006A9391 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		33DC3AFF2EA18F03001F6C27 /* BookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookView.swift; sourceTree = "<group>"; };
+		33DC3B042EA18FB2001F6C27 /* PurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -151,6 +155,8 @@
 				3329C2072EA04A9A0067666E /* DashboardView.swift */,
 				334864622EA16094006A9391 /* SettingsView.swift */,
 				3329C20D2EA04C160067666E /* BookshelfView.swift */,
+				33DC3AFF2EA18F03001F6C27 /* BookView.swift */,
+				33DC3B042EA18FB2001F6C27 /* PurchaseView.swift */,
 				3329C20B2EA04C090067666E /* ParentAuthView.swift */,
 			);
 			path = Views;
@@ -292,9 +298,11 @@
 				3329C2082EA04A9A0067666E /* DashboardView.swift in Sources */,
 				3329C1DD2EA047A60067666E /* iFind_AppApp.swift in Sources */,
 				3329C20C2EA04C090067666E /* ParentAuthView.swift in Sources */,
+				33DC3B052EA18FB5001F6C27 /* PurchaseView.swift in Sources */,
 				334864632EA16098006A9391 /* SettingsView.swift in Sources */,
 				3329C20A2EA04ADA0067666E /* SplashView.swift in Sources */,
 				3329C20E2EA04C160067666E /* BookshelfView.swift in Sources */,
+				33DC3B002EA18F06001F6C27 /* BookView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
