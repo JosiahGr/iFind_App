@@ -1,10 +1,3 @@
-//
-//  SplashView.swift
-//  iFind_App
-//
-//  Created by Josiah Green on 10/15/25.
-//
-
 import SwiftUI
 
 struct SplashView: View {

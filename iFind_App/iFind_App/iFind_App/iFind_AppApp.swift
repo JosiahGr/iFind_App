@@ -8,11 +8,11 @@
 import SwiftUI
 
 @main
-struct iFindApp: App {
+struct iFind_App: App {
     var body: some Scene {
         WindowGroup {
-            SplashView()  // shows "splashView_wallpaper", then navigates to DashboardView
+            DashboardView()
+                .preferredColorScheme(.light)
         }
     }
 }
-

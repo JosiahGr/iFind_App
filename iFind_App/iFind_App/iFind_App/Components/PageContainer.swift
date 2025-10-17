@@ -1,7 +1,5 @@
 import SwiftUI
 
-enum PageStatus { case available, completed, locked }
-
 struct PageContainer: View {
     let title: String
     let imageName: String
@@ -10,10 +8,10 @@ struct PageContainer: View {
     var onOpen: (() -> Void)?          // tap when available/completed
     var onLocked: (() -> Void)?        // tap when locked
 
-    // Style constants
+    // Style constants (match Bookshelf)
     private let size = CGSize(width: 280, height: 220)
-    private let corner: CGFloat = 5
-    private let borderWidth: CGFloat = 12
+    private let corner: CGFloat = 12
+    private let borderWidth: CGFloat = 24
 
     var body: some View {
         Button {
@@ -25,31 +23,31 @@ struct PageContainer: View {
             }
         } label: {
             ZStack {
-                // Background image
                 Image(imageName)
                     .resizable()
                     .scaledToFill()
                     .frame(width: size.width, height: size.height)
                     .clipped()
                     .cornerRadius(corner)
-                    // Dim overlay only if locked
-                    .overlay(
-                        Group {
-                            if status == .locked {
-                                RoundedRectangle(cornerRadius: corner)
-                                    .fill(Color.black.opacity(0.35))
-                            }
+
+                    // Dim only when locked (inside the clip)
+                    .overlay {
+                        if status == .locked {
+                            RoundedRectangle(cornerRadius: corner)
+                                .fill(Color.black.opacity(0.35))
                         }
-                    )
-                    // Border
+                    }
+
+                    // Outside border
                     .overlay(
-                        RoundedRectangle(cornerRadius: corner)
-                            .stroke(.black, lineWidth: borderWidth)
+                        RoundedRectangle(cornerRadius: corner + borderWidth / 2)
+                            .stroke(Color.black, lineWidth: borderWidth)
+                            .padding(-borderWidth / 2)
                     )
+
                     .clipShape(RoundedRectangle(cornerRadius: corner))
                     .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
 
-                // Title in top 1/3 of the card
                 VStack {
                     Spacer().frame(height: size.height / 3.0)
                     Text(title)
@@ -61,7 +59,6 @@ struct PageContainer: View {
                 }
                 .frame(width: size.width, height: size.height, alignment: .top)
 
-                // Finished banner for completed pages
                 if status == .completed {
                     Image("finished_banner")
                         .resizable()
@@ -87,3 +84,4 @@ struct PageContainer: View {
     }
     .padding()
 }
+

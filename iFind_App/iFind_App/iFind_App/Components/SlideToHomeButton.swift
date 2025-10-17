@@ -1,4 +1,3 @@
-// SlideToHomeButton.swift
 import SwiftUI
 
 struct SlideToHomeButton: View {
@@ -13,5 +12,13 @@ struct SlideToHomeButton: View {
             slideDistance: slideDistance,
             knobSize: knobSize
         )
+    }
+}
+
+#Preview {
+    ZStack {
+        Color.orange.ignoresSafeArea()
+        SlideToHomeButton { print("Home triggered!") }
+            .padding()
     }
 }

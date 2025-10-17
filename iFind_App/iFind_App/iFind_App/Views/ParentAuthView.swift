@@ -67,7 +67,6 @@ struct ParentAuthView: View {
             .multilineTextAlignment(.center)
             .padding()
         }
-        // Ensures transparent background behind sheet content
         .presentationBackground(.clear)
     }
 

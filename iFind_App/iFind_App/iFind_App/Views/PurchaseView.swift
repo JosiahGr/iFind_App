@@ -1,73 +1,107 @@
 import SwiftUI
 
 struct PurchaseView: View {
-    var onClose: (() -> Void)? = nil
+    // Inject handlers when you wire up StoreKit
+    var onBuy: (() -> Void)? = nil
+    var onRestore: (() -> Void)? = nil
+
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack {
-            // Dim background
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture { onClose?() }
+        GeometryReader { geo in
+            ZStack {
+                // Background art
+                Image("purchase_view_background")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
 
-            // Card
-            VStack(spacing: 20) {
-                HStack {
-                    Spacer()
+                // Content
+                VStack(spacing: 16) {
+                    Text("UNLOCK ALL INTERACTIVE BOOKS")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.black.opacity(0.75))
+                        .multilineTextAlignment(.center)
+                        .accessibilityAddTraits(.isHeader)
+
+                    // Decorative container art
+                    Image("purchase_screen_container")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: min(500, geo.size.width * 0.6),
+                               height: min(180, geo.size.height * 0.35))
+                        .accessibilityHidden(true)
+
+                    // Buy button
                     Button {
-                        onClose?()
+                        onBuy?()
+                    } label: {
+                        Text("Unlock everything for $2.99")
+                            .font(.headline.weight(.bold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.orange)
+                    .clipShape(Capsule())
+                    .padding(.horizontal, 24)
+                    .accessibilityLabel("Unlock everything for two dollars and ninety nine cents")
+
+                    // Restore
+                    Button {
+                        onRestore?()
+                    } label: {
+                        Text("Restore Purchases")
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(.orange)
+                    .padding(.horizontal, 24)
+
+                    // Legal links
+                    HStack(spacing: 6) {
+                        Link("Terms of Service", destination: URL(string: "https://www.google.com")!)
+                            .font(.subheadline)
+                            .underline()
+                        Text("and")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Link("Privacy Policy", destination: URL(string: "https://www.google.com")!)
+                            .font(.subheadline)
+                            .underline()
+                    }
+                    .foregroundStyle(.black)
+                    .padding(.top, 2)
+                }
+                .frame(maxWidth: 640)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            }
+            // Top-right close (since you hide the default back on Dashboard)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .symbolVariant(.circle.fill)
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundStyle(.gray.opacity(0.6))
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(.gray.opacity(0.7))
+                            .padding(10)
+                            .background(.ultraThinMaterial, in: Circle())
                     }
+                    .accessibilityLabel("Close")
                 }
-                .padding(.trailing, 8)
-
-                Text("Purchase This Book")
-                    .font(.title.bold())
-                    .multilineTextAlignment(.center)
-
-                Text("Unlock all pages and continue discovering!")
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal)
-
-                Spacer().frame(height: 12)
-
-                Button {
-                    print("Simulate purchase complete")
-                    onClose?()
-                } label: {
-                    Text("Purchase for $0.99")
-                        .font(.headline.bold())
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 14)
-                        .padding(.horizontal, 40)
-                        .background(Color.blue)
-                        .clipShape(Capsule())
-                }
-
-                Spacer().frame(height: 8)
-
-                Text("This is a placeholder purchase screen.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
-            .padding(24)
-            .frame(maxWidth: 420)
-            .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(.white)
-                    .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
-            )
-            .padding()
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
 
-#Preview("PurchaseView — Modal", traits: .landscapeLeft) {
-    PurchaseView()
+// Preview
+#Preview("PurchaseView — Landscape", traits: .landscapeLeft) {
+    NavigationStack {
+        PurchaseView()
+    }
 }

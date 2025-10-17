@@ -1,4 +1,3 @@
-// SlideToBackButton.swift
 import SwiftUI
 
 struct SlideToBackButton: View {
@@ -13,5 +12,13 @@ struct SlideToBackButton: View {
             slideDistance: slideDistance,
             knobSize: knobSize
         )
+    }
+}
+
+#Preview {
+    ZStack {
+        Color.yellow.ignoresSafeArea()
+        SlideToBackButton { print("Back triggered!") }
+            .padding()
     }
 }

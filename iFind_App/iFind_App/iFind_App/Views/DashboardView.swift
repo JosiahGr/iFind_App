@@ -1,10 +1,15 @@
+//  DashboardView.swift
 import SwiftUI
 
 struct DashboardView: View {
     @State private var showBookshelf = false
 
-    // Overlay routing
-    private enum OverlayRoute { case auth, settings }
+    // Value-based navigation (Hashable + Codable)
+    enum Route: String, Hashable, Codable { case purchase }
+    @State private var navPath = NavigationPath()
+
+    // Overlay routes
+    private enum OverlayRoute { case authForSettings, authForPurchase, settings }
     @State private var overlayRoute: OverlayRoute? = nil
 
     var body: some View {
@@ -13,81 +18,109 @@ struct DashboardView: View {
                 .ignoresSafeArea()
                 .transaction { $0.animation = nil }
         } else {
-            ZStack {
-                // Background
-                Image("dashboardView_wallpaper")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+            NavigationStack(path: $navPath) {
+                ZStack {
+                    Image("dashboardView_wallpaper")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
 
-                // Bookshelf card
-                DashboardCard(
-                    title: "Bookshelf",
-                    imageName: "bookshelfView_container"
-                )
-                .onTapGesture { withAnimation(.none) { showBookshelf = true } }
+                    // Bookshelf card
+                    DashboardCard(title: "Bookshelf", imageName: "bookshelfView_container")
+                        .onTapGesture { withAnimation(.none) { showBookshelf = true } }
 
-                // Settings button
-                VStack {
-                    HStack {
-                        Spacer()
-                        Button {
-                            overlayRoute = .auth   // start at parent gate
-                        } label: {
-                            Image(systemName: "gearshape.fill")
-                                .font(.title2)
-                                .padding(8)
-                                .background(.ultraThinMaterial, in: Circle())
+                    // Top-right buttons (purchase + settings)
+                    VStack {
+                        HStack(spacing: 8) {
+                            Spacer()
+
+                            // Purchase (auth first)
+                            Button {
+                                overlayRoute = .authForPurchase
+                            } label: {
+                                Image(systemName: "crown.fill") // or "star.fill"
+                                    .font(.title)
+                                    .padding(20)
+                                    .background(.ultraThinMaterial, in: Circle())
+                                    .accessibilityLabel("Open purchase screen")
+                            }
+
+                            // Settings
+                            Button {
+                                overlayRoute = .authForSettings
+                            } label: {
+                                Image(systemName: "gearshape.fill")
+                                    .font(.title)
+                                    .padding(20)
+                                    .background(.ultraThinMaterial, in: Circle())
+                                    .accessibilityLabel("Open settings")
+                            }
                         }
                         .padding(.top, 16)
-                        .padding(.trailing, 16)
+                        .padding(.trailing, 32)
+
+                        Spacer()
                     }
-                    Spacer()
-                }
 
-                // === Custom modal overlay ===
-                if let route = overlayRoute {
-                    ZStack {
-                        // Dim behind the card
-                        Color.black.opacity(0.4)
-                            .ignoresSafeArea()
-                            .onTapGesture { overlayRoute = nil }
+                    // Overlays (auth/settings only)
+                    if let route = overlayRoute {
+                        ZStack {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                                .onTapGesture { overlayRoute = nil }
 
-                        // Routed card
-                        Group {
-                            switch route {
-                            case .auth:
+                            // if/else avoids ViewBuilder inference issues
+                            if route == .authForSettings {
                                 ParentAuthView(
                                     onSuccess: { overlayRoute = .settings },
                                     onCancel:  { overlayRoute = nil },
-                                    dimOpacity: 0 // card provides no extra dim
+                                    dimOpacity: 0
                                 )
-                            case .settings:
+                            } else if route == .authForPurchase {
+                                ParentAuthView(
+                                    onSuccess: {
+                                        overlayRoute = nil
+                                        // push next tick so it isn’t swallowed by fade-out
+                                        DispatchQueue.main.async {
+                                            navPath.append(Route.purchase) // <-- explicit type
+                                        }
+                                    },
+                                    onCancel:  { overlayRoute = nil },
+                                    dimOpacity: 0
+                                )
+                            } else if route == .settings {
                                 SettingsView(
                                     didClose: { overlayRoute = nil },
                                     onResetProgress: { /* show ResetProgressView */ },
                                     onRestorePurchases: { /* StoreKit restore */ },
-                                    dimOpacity: 0 // card provides no extra dim
+                                    dimOpacity: 0
                                 )
                             }
                         }
-                        .transition(.opacity) // gentle fade between auth <-> settings
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 0.2), value: overlayRoute)
                     }
-                    .animation(.easeInOut(duration: 0.2), value: overlayRoute)
+                }
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(for: Route.self) { route in
+                    switch route {
+                    case .purchase:
+                        PurchaseView() // page-style; no params
+                    }
                 }
             }
         }
     }
 }
 
-// Same DashboardCard as before...
+// MARK: - DashboardCard (unchanged)
 private struct DashboardCard: View {
     let title: String
     let imageName: String
 
-    private let cardSize = CGSize(width: 336, height: 208)
+    private let cardSize = CGSize(width: 315, height: 250)
     private let cornerRadius: CGFloat = 18
-    private let frameBorderWidth: CGFloat = 12
+    private let frameBorderWidth: CGFloat = 18
 
     var body: some View {
         ZStack {
@@ -98,8 +131,9 @@ private struct DashboardCard: View {
                 .clipped()
                 .cornerRadius(cornerRadius)
                 .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(.white, lineWidth: frameBorderWidth)
+                    RoundedRectangle(cornerRadius: cornerRadius + frameBorderWidth / 2)
+                        .stroke(Color.white.opacity(0.8), lineWidth: frameBorderWidth)
+                        .padding(-frameBorderWidth / 2)
                 )
                 .shadow(radius: 8, x: 2, y: 4)
 

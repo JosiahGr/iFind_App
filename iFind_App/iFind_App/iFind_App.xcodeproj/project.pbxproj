@@ -61,6 +61,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		332D05C32EA2DBEC00630BFD /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
 		334864652EA16961006A9391 /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Components;
@@ -118,6 +123,7 @@
 			children = (
 				339EF4B72EA2C5FB00FC489E /* Haptics.swift */,
 				3329C1DC2EA047A60067666E /* iFind_AppApp.swift */,
+				332D05C32EA2DBEC00630BFD /* Models */,
 				334864652EA16961006A9391 /* Components */,
 				3329C2062EA04A6F0067666E /* Views */,
 				3329C1E02EA047A70067666E /* Assets.xcassets */,
@@ -181,6 +187,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				332D05C32EA2DBEC00630BFD /* Models */,
 				334864652EA16961006A9391 /* Components */,
 			);
 			name = iFind_App;

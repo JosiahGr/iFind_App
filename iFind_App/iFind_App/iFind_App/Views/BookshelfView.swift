@@ -1,47 +1,51 @@
-// BookshelfView.swift
 import SwiftUI
 
 struct BookshelfView: View {
     var onBack: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
 
-    @State private var openBook = false  // opens the unlocked book
+    @State private var openBook = false
+    @State private var pressedIndex: Int? = nil   // ← new
 
     var body: some View {
         if openBook {
-            // Pass a closure so the back slider in BookView can return here
-            BookView(onBack: {
-                withAnimation(.none) { openBook = false }
-            })
-            .ignoresSafeArea()
-            .transaction { $0.animation = nil }
+            BookView(onBack: { withAnimation(.none) { openBook = false } })
+                .ignoresSafeArea()
+                .transaction { $0.animation = nil }
         } else {
             ZStack {
-                Image("bookshelfView_wallpaper")
+                Image("bookshelfView_container")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 36) {
-                        BookshelfCard(
-                            title: "Animals",
-                            imageName: "animals_container",
-                            isLocked: false
-                        )
-                        .onTapGesture { withAnimation(.none) { openBook = true } }
 
-                        BookshelfCard(
-                            title: "Coming Soon",
-                            imageName: "bookshelfView_container",
-                            isLocked: true
-                        )
+                        // 1
+                        BookshelfCard(title: "Animals",
+                                      imageName: "animals_container",
+                                      isLocked: false)
+                            .onTapGesture { withAnimation(.none) { openBook = true } }
+                            .pressToScale { pressing in pressedIndex = pressing ? 1 : nil }
+                            .bobbing(amplitude: 5, period: 3.4, phase: 0.0,
+                                     paused: openBook || pressedIndex == 1)
 
-                        BookshelfCard(
-                            title: "Coming Soon",
-                            imageName: "bookshelfView_container",
-                            isLocked: true
-                        )
+                        // 2
+                        BookshelfCard(title: "Coming Soon",
+                                      imageName: "bookshelfView_container",
+                                      isLocked: true)
+                            .pressToScale { pressing in pressedIndex = pressing ? 2 : nil }
+                            .bobbing(amplitude: 5, period: 3.4, phase: 0.4,
+                                     paused: openBook || pressedIndex == 2)
+
+                        // 3
+                        BookshelfCard(title: "Coming Soon",
+                                      imageName: "bookshelfView_container",
+                                      isLocked: true)
+                            .pressToScale { pressing in pressedIndex = pressing ? 3 : nil }
+                            .bobbing(amplitude: 5, period: 3.4, phase: 0.8,
+                                     paused: openBook || pressedIndex == 3)
                     }
                     .padding(.leading, 124)
                     .padding(.trailing, 40)
@@ -54,9 +58,9 @@ struct BookshelfView: View {
                     HStack {
                         Spacer()
                         SlideToHomeButton { goBack() }
-                            .padding(.trailing, 32)
-                            .padding(.top, 12)
-                            .zIndex(2)
+                            .frame(width: 180)
+                            .padding(.trailing, 44)
+                            .padding(.top, 20)
                     }
                     Spacer()
                 }
@@ -69,32 +73,20 @@ struct BookshelfView: View {
     }
 }
 
+
 private struct BookshelfCard: View {
     let title: String
     let imageName: String
     let isLocked: Bool
 
     private let size = CGSize(width: 280, height: 220)
-    private let corner: CGFloat = 5
+    private let corner: CGFloat = 12
     private let borderWidth: CGFloat = 24
     private let badgeHeight: CGFloat = 32
 
     var body: some View {
-        VStack(spacing: 8) {
-            if isLocked {
-                HStack(spacing: 8) {
-                    Image(systemName: "lock.fill").font(.title2.bold())
-                    Text("Locked").font(.headline.weight(.semibold))
-                }
-                .foregroundStyle(.white)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 10)
-                .background(.black.opacity(0.6), in: Capsule())
-                .shadow(radius: 4, y: 2)
-            } else {
-                Color.clear.frame(height: badgeHeight)
-            }
-
+        VStack(spacing: 10) {
+            // Image container
             ZStack {
                 Image(imageName)
                     .resizable()
@@ -114,6 +106,7 @@ private struct BookshelfCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: corner))
                     .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
 
+                // Title still overlays the container
                 VStack {
                     Spacer().frame(height: size.height / 3.0)
                     Text(title)
@@ -124,11 +117,30 @@ private struct BookshelfCard: View {
                 }
                 .frame(width: size.width, height: size.height, alignment: .top)
             }
+
+            // Moved the Locked pill below the container
+            Group {
+                if isLocked {
+                    HStack(spacing: 8) {
+                        Image(systemName: "lock.fill").font(.title2.bold())
+                        Text("Locked").font(.headline.weight(.semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 10)
+                    .background(.black.opacity(0.6), in: Capsule())
+                    .shadow(radius: 4, y: 2)
+                } else {
+                    // Keep heights consistent across cards
+                    Color.clear.frame(height: badgeHeight)
+                }
+            }
         }
         .contentShape(RoundedRectangle(cornerRadius: corner))
     }
 }
 
-#Preview("BookshelfView – Landscape", traits: .landscapeLeft) {
+
+#Preview("BookshelfView – Landscape Left", traits: .landscapeLeft) {
     BookshelfView()
 }

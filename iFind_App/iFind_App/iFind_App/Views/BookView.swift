@@ -1,12 +1,18 @@
-// BookView.swift
 import SwiftUI
 
 struct BookView: View {
     var onBack: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
 
-    private enum OverlayRoute { case auth, purchase }
+    // If you still need parent auth for *anything* inside BookView, keep this.
+    // Otherwise you can delete OverlayRoute + overlay entirely.
+    private enum OverlayRoute { case auth }
     @State private var overlayRoute: OverlayRoute? = nil
+
+    @State private var pressedIndex: Int? = nil
+
+    // Around 65% of the old size
+    private let cardSize = CGSize(width: 160, height: 200)
 
     var body: some View {
         ZStack {
@@ -14,89 +20,79 @@ struct BookView: View {
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
+                .opacity(0.0)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 36) {
-                    PageContainer(
-                        title: "Page 1",
-                        imageName: "animals_container",
-                        status: PageStatus.available,
-                        onOpen: { print("Open Page 1") },
-                        onLocked: nil as (() -> Void)?
-                    )
+                HStack(spacing: 28) {
+                    ForEach(0..<10) { i in
+                        let status: PageStatus =
+                            (i == 0) ? .available :
+                            (i == 1) ? .completed : .locked
 
-                    PageContainer(
-                        title: "Page 2",
-                        imageName: "animals_container",
-                        status: PageStatus.completed,
-                        onOpen: { print("Open Page 2 (Completed)") },
-                        onLocked: nil as (() -> Void)?
-                    )
-
-                    PageContainer(
-                        title: "New Pack",
-                        imageName: "animals_container",
-                        status: PageStatus.locked,
-                        onOpen: nil,
-                        onLocked: { overlayRoute = .auth }
-                    )
+                        PageCard(
+                            title: "Page \(i + 1)",
+                            imageName: "animals_container",
+                            status: status,
+                            cardSize: cardSize
+                        )
+                        .pressToScale { pressing in pressedIndex = pressing ? i : nil }
+                        .bobbing(
+                            amplitude: 5,
+                            period: 3.4,
+                            phase: Double(i) * 0.2,
+                            paused: overlayRoute != nil || pressedIndex == i
+                        )
+                        // Example: if you want auth when tapping a locked page:
+                        // .onTapGesture {
+                        //     if status == .locked { overlayRoute = .auth }
+                        // }
+                    }
                 }
-                .padding(.leading, 124)
-                .padding(.trailing, 40)
-                .padding(.top, 72)
+                .padding(.leading, 80)
+                .padding(.trailing, 32)
+                .padding(.top, 56)
                 .padding(.bottom, 24)
             }
 
-            // Slide to Back (top left)
+            // Back chevron
             VStack {
                 HStack {
-                    SlideToBackButton {
+                    Button {
                         if let onBack { onBack() } else { dismiss() }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title2.bold())
+                            .foregroundStyle(.black.opacity(0.85))
+                            .padding(20)
+                            .background(.ultraThinMaterial, in: Circle())
+                            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                     }
                     .padding(.leading, 24)
-                    .padding(.top, 16)
-                    .zIndex(2)
-                    .opacity(overlayRoute == nil ? 1 : 0)
-                    .allowsHitTesting(overlayRoute == nil)
+                    .padding(.top, 20)
                     Spacer()
                 }
                 Spacer()
             }
+            .zIndex(2)
+            .opacity(overlayRoute == nil ? 1 : 0)
+            .allowsHitTesting(overlayRoute == nil)
 
-            // Overlay flow
-            if let route = overlayRoute {
+            // Optional: parent auth overlay ONLY (no purchase case)
+            if let route = overlayRoute, route == .auth {
                 ZStack {
                     Color.black.opacity(0.4)
                         .ignoresSafeArea()
                         .onTapGesture { overlayRoute = nil }
 
-                    Group {
-                        switch route {
-                        case .auth:
-                            ParentAuthView(
-                                onSuccess: { overlayRoute = .purchase },
-                                onCancel:  { overlayRoute = nil },
-                                dimOpacity: 0
-                            )
-                        case .purchase:
-                            PurchaseView(onClose: { overlayRoute = nil })
-                                .frame(maxWidth: 520)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 22)
-                                        .fill(.white)
-                                        .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
-                                )
-                                .padding()
-                        }
-                    }
-                    .transition(.opacity)
+                    ParentAuthView(
+                        onSuccess: { overlayRoute = nil },
+                        onCancel:  { overlayRoute = nil },
+                        dimOpacity: 0
+                    )
                 }
+                .transition(.opacity)
                 .animation(.easeInOut(duration: 0.2), value: overlayRoute)
             }
         }
     }
-}
-
-#Preview("BookView – Landscape", traits: .landscapeLeft) {
-    BookView()
 }
