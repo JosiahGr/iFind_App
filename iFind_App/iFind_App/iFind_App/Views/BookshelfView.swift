@@ -1,3 +1,4 @@
+// BookshelfView.swift
 import SwiftUI
 
 struct BookshelfView: View {
@@ -8,12 +9,15 @@ struct BookshelfView: View {
 
     var body: some View {
         if openBook {
-            BookView()
-                .ignoresSafeArea()
-                .transaction { $0.animation = nil }
+            // Pass a closure so the back slider in BookView can return here
+            BookView(onBack: {
+                withAnimation(.none) { openBook = false }
+            })
+            .ignoresSafeArea()
+            .transaction { $0.animation = nil }
         } else {
             ZStack {
-                Image("bookshelfView_container")
+                Image("bookshelfView_wallpaper")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -29,13 +33,13 @@ struct BookshelfView: View {
 
                         BookshelfCard(
                             title: "Coming Soon",
-                            imageName: "bookshelfView_wallpaper",
+                            imageName: "bookshelfView_container",
                             isLocked: true
                         )
 
                         BookshelfCard(
                             title: "Coming Soon",
-                            imageName: "bookshelfView_wallpaper",
+                            imageName: "bookshelfView_container",
                             isLocked: true
                         )
                     }
@@ -45,13 +49,14 @@ struct BookshelfView: View {
                     .padding(.bottom, 24)
                 }
 
+                // Slide to Home (top right)
                 VStack {
                     HStack {
                         Spacer()
                         SlideToHomeButton { goBack() }
-                            .frame(width: 180)
                             .padding(.trailing, 32)
                             .padding(.top, 12)
+                            .zIndex(2)
                     }
                     Spacer()
                 }

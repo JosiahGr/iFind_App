@@ -1,14 +1,14 @@
-// SlideToHomeButton.swift
+// SlideToBackButton.swift
 import SwiftUI
 
-struct SlideToHomeButton: View {
+struct SlideToBackButton: View {
     var onSlideComplete: () -> Void
     var slideDistance: CGFloat = 96
     var knobSize: CGFloat = 32
 
     var body: some View {
         SlideControl(
-            systemIcon: "house.fill",
+            systemIcon: "chevron.left",
             onSlideComplete: onSlideComplete,
             slideDistance: slideDistance,
             knobSize: knobSize

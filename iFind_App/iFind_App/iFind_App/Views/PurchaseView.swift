@@ -68,14 +68,6 @@ struct PurchaseView: View {
     }
 }
 
-#Preview("PurchaseView – Modal") {
+#Preview("PurchaseView — Modal", traits: .landscapeLeft) {
     PurchaseView()
-        .previewInterfaceOrientation(.landscapeLeft)
 }
-//
-//  PurchaseView.swift
-//  iFind_App
-//
-//  Created by Josiah Green on 10/16/25.
-//
-

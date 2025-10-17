@@ -18,6 +18,7 @@
 		3329C20C2EA04C090067666E /* ParentAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3329C20B2EA04C090067666E /* ParentAuthView.swift */; };
 		3329C20E2EA04C160067666E /* BookshelfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3329C20D2EA04C160067666E /* BookshelfView.swift */; };
 		334864632EA16098006A9391 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 334864622EA16094006A9391 /* SettingsView.swift */; };
+		339EF4B82EA2C5FE00FC489E /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339EF4B72EA2C5FB00FC489E /* Haptics.swift */; };
 		33DC3B002EA18F06001F6C27 /* BookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DC3AFF2EA18F03001F6C27 /* BookView.swift */; };
 		33DC3B052EA18FB5001F6C27 /* PurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DC3B042EA18FB2001F6C27 /* PurchaseView.swift */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,7 @@
 		3329C20B2EA04C090067666E /* ParentAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentAuthView.swift; sourceTree = "<group>"; };
 		3329C20D2EA04C160067666E /* BookshelfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookshelfView.swift; sourceTree = "<group>"; };
 		334864622EA16094006A9391 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		339EF4B72EA2C5FB00FC489E /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		33DC3AFF2EA18F03001F6C27 /* BookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookView.swift; sourceTree = "<group>"; };
 		33DC3B042EA18FB2001F6C27 /* PurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -114,6 +116,7 @@
 		3329C1DB2EA047A60067666E /* iFind_App */ = {
 			isa = PBXGroup;
 			children = (
+				339EF4B72EA2C5FB00FC489E /* Haptics.swift */,
 				3329C1DC2EA047A60067666E /* iFind_AppApp.swift */,
 				334864652EA16961006A9391 /* Components */,
 				3329C2062EA04A6F0067666E /* Views */,
@@ -300,6 +303,7 @@
 				3329C20C2EA04C090067666E /* ParentAuthView.swift in Sources */,
 				33DC3B052EA18FB5001F6C27 /* PurchaseView.swift in Sources */,
 				334864632EA16098006A9391 /* SettingsView.swift in Sources */,
+				339EF4B82EA2C5FE00FC489E /* Haptics.swift in Sources */,
 				3329C20A2EA04ADA0067666E /* SplashView.swift in Sources */,
 				3329C20E2EA04C160067666E /* BookshelfView.swift in Sources */,
 				33DC3B002EA18F06001F6C27 /* BookView.swift in Sources */,

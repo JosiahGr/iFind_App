@@ -1,10 +1,10 @@
+// BookView.swift
 import SwiftUI
 
 struct BookView: View {
     var onBack: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
 
-    // Optional overlay routing (ParentAuth -> Purchase)
     private enum OverlayRoute { case auth, purchase }
     @State private var overlayRoute: OverlayRoute? = nil
 
@@ -15,34 +15,24 @@ struct BookView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
 
-            // Horizontal row of pages
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 36) {
-
-                    // 1) Available page
                     PageContainer(
                         title: "Page 1",
                         imageName: "animals_container",
                         status: PageStatus.available,
-                        onOpen: {
-                            // TODO: push your real PageView
-                            print("Open Page 1")
-                        },
+                        onOpen: { print("Open Page 1") },
                         onLocked: nil as (() -> Void)?
                     )
 
-                    // 2) Completed page
                     PageContainer(
                         title: "Page 2",
                         imageName: "animals_container",
                         status: PageStatus.completed,
-                        onOpen: {
-                            print("Open Page 2 (Completed)")
-                        },
+                        onOpen: { print("Open Page 2 (Completed)") },
                         onLocked: nil as (() -> Void)?
                     )
 
-                    // 3) Locked page (ParentAuth -> Purchase)
                     PageContainer(
                         title: "New Pack",
                         imageName: "animals_container",
@@ -57,20 +47,17 @@ struct BookView: View {
                 .padding(.bottom, 24)
             }
 
-            // Simple back chevron (swap for slide-home if you want)
+            // Slide to Back (top left)
             VStack {
                 HStack {
-                    Button {
+                    SlideToBackButton {
                         if let onBack { onBack() } else { dismiss() }
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.title2.bold())
-                            .foregroundStyle(.black.opacity(0.85))
-                            .padding(10)
-                            .background(.ultraThinMaterial, in: Circle())
                     }
                     .padding(.leading, 24)
                     .padding(.top, 16)
+                    .zIndex(2)
+                    .opacity(overlayRoute == nil ? 1 : 0)
+                    .allowsHitTesting(overlayRoute == nil)
                     Spacer()
                 }
                 Spacer()
