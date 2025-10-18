@@ -1,4 +1,3 @@
-//  DashboardView.swift
 import SwiftUI
 
 struct DashboardView: View {
@@ -39,8 +38,8 @@ struct DashboardView: View {
                                 overlayRoute = .authForPurchase
                             } label: {
                                 Image(systemName: "crown.fill") // or "star.fill"
-                                    .font(.title)
-                                    .padding(20)
+                                    .font(.title2)
+                                    .padding(16)
                                     .background(.ultraThinMaterial, in: Circle())
                                     .accessibilityLabel("Open purchase screen")
                             }
@@ -50,8 +49,8 @@ struct DashboardView: View {
                                 overlayRoute = .authForSettings
                             } label: {
                                 Image(systemName: "gearshape.fill")
-                                    .font(.title)
-                                    .padding(20)
+                                    .font(.title2)
+                                    .padding(16)
                                     .background(.ultraThinMaterial, in: Circle())
                                     .accessibilityLabel("Open settings")
                             }
@@ -105,7 +104,7 @@ struct DashboardView: View {
                 .navigationDestination(for: Route.self) { route in
                     switch route {
                     case .purchase:
-                        PurchaseView() // page-style; no params
+                        PurchaseView()
                     }
                 }
             }
@@ -138,7 +137,7 @@ private struct DashboardCard: View {
                 .shadow(radius: 8, x: 2, y: 4)
 
             Text(title)
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: 36, weight: .bold))
                 .foregroundStyle(.white)
                 .shadow(radius: 4)
         }

@@ -3,7 +3,7 @@ import SwiftUI
 struct SlideToHomeButton: View {
     var onSlideComplete: () -> Void
     var slideDistance: CGFloat = 96
-    var knobSize: CGFloat = 32
+    var knobSize: CGFloat = 38
 
     var body: some View {
         SlideControl(

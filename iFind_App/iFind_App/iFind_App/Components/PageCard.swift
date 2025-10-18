@@ -126,11 +126,12 @@ private struct PageStatusIcon: View {
 
     var body: some View {
         Image(systemName: icon)
-            .font(.system(size: 26, weight: .bold))
+            .font(.system(size: 20))
             .foregroundStyle(.white)
             .frame(width: 44, height: 44)
             .background(color, in: Circle())
             .shadow(color: color.opacity(0.35), radius: 4, y: 2)
             .accessibilityLabel(kind == .unlock ? "Unlock" : kind == .play ? "Play" : "Completed")
+            .padding(.top, 16)
     }
 }

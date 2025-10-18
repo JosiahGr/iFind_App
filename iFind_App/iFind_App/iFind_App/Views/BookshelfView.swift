@@ -5,11 +5,12 @@ struct BookshelfView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var openBook = false
-    @State private var pressedIndex: Int? = nil   // ← new
+    @State private var pressedIndex: Int? = nil
+    @State private var currentBookTitle: String = ""   // <-- NEW
 
     var body: some View {
         if openBook {
-            BookView(onBack: { withAnimation(.none) { openBook = false } })
+            BookView(bookTitle: currentBookTitle, onBack: { withAnimation(.none) { openBook = false } })
                 .ignoresSafeArea()
                 .transaction { $0.animation = nil }
         } else {
@@ -22,16 +23,21 @@ struct BookshelfView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 36) {
 
-                        // 1
+                        // 1 — Animals (unlocked)
                         BookshelfCard(title: "Animals",
                                       imageName: "animals_container",
                                       isLocked: false)
-                            .onTapGesture { withAnimation(.none) { openBook = true } }
+                            .onTapGesture {
+                                withAnimation(.none) {
+                                    currentBookTitle = "Animals"   // <-- NEW
+                                    openBook = true
+                                }
+                            }
                             .pressToScale { pressing in pressedIndex = pressing ? 1 : nil }
                             .bobbing(amplitude: 5, period: 3.4, phase: 0.0,
                                      paused: openBook || pressedIndex == 1)
 
-                        // 2
+                        // 2 — Coming Soon (locked)
                         BookshelfCard(title: "Coming Soon",
                                       imageName: "bookshelfView_container",
                                       isLocked: true)
@@ -39,7 +45,7 @@ struct BookshelfView: View {
                             .bobbing(amplitude: 5, period: 3.4, phase: 0.4,
                                      paused: openBook || pressedIndex == 2)
 
-                        // 3
+                        // 3 — Coming Soon (locked)
                         BookshelfCard(title: "Coming Soon",
                                       imageName: "bookshelfView_container",
                                       isLocked: true)
@@ -56,11 +62,12 @@ struct BookshelfView: View {
                 // Slide to Home (top right)
                 VStack {
                     HStack {
-                        Spacer()
+
                         SlideToHomeButton { goBack() }
                             .frame(width: 180)
-                            .padding(.trailing, 44)
+                            .padding(.leading, 20)
                             .padding(.top, 20)
+                        Spacer()
                     }
                     Spacer()
                 }
@@ -73,7 +80,7 @@ struct BookshelfView: View {
     }
 }
 
-
+// MARK: - BookshelfCard (unchanged)
 private struct BookshelfCard: View {
     let title: String
     let imageName: String
@@ -106,7 +113,7 @@ private struct BookshelfCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: corner))
                     .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
 
-                // Title still overlays the container
+                // Title overlays the container
                 VStack {
                     Spacer().frame(height: size.height / 3.0)
                     Text(title)
@@ -118,7 +125,7 @@ private struct BookshelfCard: View {
                 .frame(width: size.width, height: size.height, alignment: .top)
             }
 
-            // Moved the Locked pill below the container
+            // Locked pill below the container
             Group {
                 if isLocked {
                     HStack(spacing: 8) {
@@ -139,7 +146,6 @@ private struct BookshelfCard: View {
         .contentShape(RoundedRectangle(cornerRadius: corner))
     }
 }
-
 
 #Preview("BookshelfView – Landscape Left", traits: .landscapeLeft) {
     BookshelfView()
