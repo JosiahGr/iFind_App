@@ -5,34 +5,34 @@ import SwiftUI
 /// One tappable target in the scene.
 struct PageTarget: Identifiable, Hashable {
     let id = UUID()
-    let imageName: String            // thumbnail shown bottom-right
+    let imageName: String            // bottom-right thumbnail
     let hitRect: CGRect              // in ORIGINAL scene pixels
     let accessibilityLabel: String
 }
 
 /// A level definition for one scene.
 struct PageLevel: Hashable {
-    let sceneImageName: String       // full-bleed background art
-    let sceneImageSize: CGSize       // ORIGINAL pixels of the scene art
-    let targets: [PageTarget]        // up to ~10
+    let sceneImageName: String
+    let sceneImageSize: CGSize       // ORIGINAL pixel size of the art
+    let targets: [PageTarget]        // ordered search list
 }
 
-/// Helper to convert tap points from view space to the original image pixel space.
+/// Helper that maps taps in the view to the original image pixel space,
+/// accounting for how the image is fit into the view.
 struct ImageSpaceMapper {
     let original: CGSize
 
     func fittedImageRect(in container: CGSize) -> CGRect {
-        let imageAspect = original.width / original.height
-        let viewAspect  = container.width / container.height
-
-        if imageAspect > viewAspect {
-            // Image wider than view, height fits
+        let imgA = original.width / original.height
+        let viewA = container.width / container.height
+        if imgA > viewA {
+            // Image wider than view: height fits
             let scale = container.height / original.height
             let width = original.width * scale
             let x = (container.width - width) / 2
             return CGRect(x: x, y: 0, width: width, height: container.height)
         } else {
-            // Image taller than view, width fits
+            // Image taller than view: width fits
             let scale = container.width / original.width
             let height = original.height * scale
             let y = (container.height - height) / 2
@@ -54,19 +54,23 @@ struct ImageSpaceMapper {
 
 struct PageView: View {
     let level: PageLevel
-    var onExit: (() -> Void)? = nil   // SlideToBack completes → call this
+    var onExit: (() -> Void)? = nil
 
     @State private var foundCount = 0
     @State private var currentIndex = 0
     @State private var showWin = false
-    @State private var tapFeedback = false
 
-    private let maxStars = 10
+    // tap feedback
+    @State private var tapFeedback = false            // pulse on thumbnail
+    @State private var hitBadgePoint: CGPoint? = nil  // checkmark where tapped
+
+    // Stars are dynamic: equal to number of targets in this level
+    private var totalStars: Int { max(1, level.targets.count) }
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                // Scene artwork
+                // SCENE
                 Image(level.sceneImageName)
                     .resizable()
                     .scaledToFill()
@@ -80,30 +84,38 @@ struct PageView: View {
                                 handleTap(at: g.location, in: geo.size)
                             }
                     )
-                    .accessibilityLabel("Seek and find scene")
-                    .accessibilityAddTraits(.isImage)
 
-                // UI Chrome
+                // CHECKMARK where correct tap happened
+                if let p = hitBadgePoint {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 36, weight: .bold))
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .position(p)
+                        .transition(.scale.combined(with: .opacity))
+                }
+
+                // UI overlay
                 VStack {
                     HStack {
-                        // TOP-LEFT: slide back
+                        // top-left back slider
                         SlideToBackButton {
                             onExit?()
                         }
-                        .padding(.leading, 20)
-                        .padding(.top, 20)
+                        .padding(.leading, 24)
+                        .padding(.top, 16)
 
                         Spacer()
 
-                        // TOP-RIGHT: stars
-                        StarMeter(found: foundCount, total: maxStars)
+                        // top-right stars
+                        StarMeter(found: foundCount, total: totalStars)
                             .padding(.trailing, 24)
-                            .padding(.top, 20)
+                            .padding(.top, 16)
                     }
 
                     Spacer()
 
-                    // BOTTOM-RIGHT: current target thumbnail
+                    // bottom-right current target thumbnail
                     if let target = currentTarget {
                         Image(target.imageName)
                             .resizable()
@@ -118,7 +130,6 @@ struct PageView: View {
                             .padding(.trailing, 24)
                             .padding(.bottom, 18)
                             .overlay(alignment: .topTrailing) {
-                                // a tiny pulse when you tap the correct spot
                                 Circle()
                                     .strokeBorder(Color.white.opacity(tapFeedback ? 0.9 : 0.0), lineWidth: 3)
                                     .frame(width: 22, height: 22)
@@ -140,7 +151,7 @@ struct PageView: View {
                             .font(.system(size: 48, weight: .bold))
                         Text("Great job!")
                             .font(.system(size: 44, weight: .heavy))
-                        Text("You found all 10!")
+                        Text("You found them all!")
                             .font(.headline)
                     }
                     .padding(.horizontal, 24)
@@ -160,28 +171,30 @@ struct PageView: View {
         return level.targets[min(currentIndex, level.targets.count - 1)]
     }
 
-    private func handleTap(at point: CGPoint, in container: CGSize) {
+    private func handleTap(at viewPoint: CGPoint, in container: CGSize) {
         guard let target = currentTarget else { return }
-
         let mapper = ImageSpaceMapper(original: level.sceneImageSize)
-        guard let ip = mapper.viewPointToImagePoint(point, container: container) else { return }
+        guard let imgPt = mapper.viewPointToImagePoint(viewPoint, container: container) else { return }
 
-        if target.hitRect.contains(ip) {
-            // correct!
+        if target.hitRect.contains(imgPt) {
+            // success!
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            withAnimation(.easeOut(duration: 0.28)) {
-                tapFeedback = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                tapFeedback = false
+            withAnimation(.easeOut(duration: 0.25)) { tapFeedback = true }
+            hitBadgePoint = viewPoint
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { tapFeedback = false }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                withAnimation(.easeInOut(duration: 0.25)) { hitBadgePoint = nil }
             }
 
-            foundCount = min(foundCount + 1, maxStars)
+            foundCount = min(foundCount + 1, totalStars)
+
+            // advance to next target (one active at a time)
             if currentIndex < level.targets.count - 1 {
                 currentIndex += 1
             }
 
-            if foundCount >= maxStars {
+            // win when all targets found
+            if foundCount >= totalStars {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showWin = true
                 }
@@ -194,7 +207,6 @@ struct PageView: View {
 }
 
 // MARK: - Star Meter
-
 private struct StarMeter: View {
     let found: Int
     let total: Int

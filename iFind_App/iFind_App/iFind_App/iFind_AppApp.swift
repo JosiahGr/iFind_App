@@ -11,7 +11,7 @@ import SwiftUI
 struct iFind_App: App {
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            SplashView()
                 .preferredColorScheme(.light)
         }
     }

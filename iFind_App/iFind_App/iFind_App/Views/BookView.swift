@@ -9,7 +9,7 @@ struct BookView: View {
     @State private var overlayRoute: OverlayRoute? = nil
     @State private var pressedIndex: Int? = nil
 
-    // NEW: open PageView + selected level
+    // Open PageView + selected level
     @State private var openPage = false
     @State private var selectedLevel: PageLevel? = nil
 
@@ -21,12 +21,8 @@ struct BookView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            Image("animals_wallpaper")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                .opacity(0.0)
+            // Background (just a neutral backdrop here)
+            Color.clear.ignoresSafeArea()
 
             // Cards
             ScrollView(.horizontal, showsIndicators: false) {
@@ -45,7 +41,7 @@ struct BookView: View {
                         // Open PageView only for non-locked pages
                         .onTapGesture {
                             guard status != .locked else { return }
-                            openExampleLevel(pageIndex: i)
+                            openAnimalsLevel() // uses Animals-05 + 6 targets
                         }
                         .pressToScale { pressing in pressedIndex = pressing ? i : nil }
                         .bobbing(
@@ -68,7 +64,7 @@ struct BookView: View {
                     Button {
                         if let onBack { onBack() } else { dismiss() }
                     } label: {
-                        Image(systemName: "chevron.left") 
+                        Image(systemName: "chevron.left")
                             .font(.title3.weight(.bold))
                             .foregroundStyle(.white)
                             .padding(12)
@@ -122,31 +118,68 @@ struct BookView: View {
         }
     }
 
-    // MARK: - Open a placeholder PageLevel (replace with your real data)
-    private func openExampleLevel(pageIndex: Int) {
-        // TODO: replace names/sizes with your real scene + 10 thumbnails
-        let sceneSize = CGSize(width: 3840, height: 2160) // example 4K landscape
+    // MARK: - Level using animals_wallpaper (1664 × 768) with refined hit boxes
+    private func openAnimalsLevel() {
+        // Exact pixel size of the asset in your xcassets
+        let sceneSize = CGSize(width: 1664, height: 768)
 
+        // Helper to convert percentage-based rects (0...1) into pixel-space rects
+        func pxRect(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat) -> CGRect {
+            return CGRect(x: x * sceneSize.width,
+                          y: y * sceneSize.height,
+                          width:  w * sceneSize.width,
+                          height: h * sceneSize.height)
+        }
+
+        // Bear → Bird → Penguin → Lion → Monkey → Rabbit
+        // Percentages are measured in ORIGINAL image space (top-left origin).
+        // These are generous kid-friendly boxes aligned to your Animals-05 layout.
         let targets: [PageTarget] = [
-            PageTarget(imageName: "thumb_1", hitRect: CGRect(x: 300,  y: 1450, width: 260, height: 220), accessibilityLabel: "Target 1"),
-            PageTarget(imageName: "thumb_2", hitRect: CGRect(x: 760,  y: 980,  width: 240, height: 240), accessibilityLabel: "Target 2"),
-            PageTarget(imageName: "thumb_3", hitRect: CGRect(x: 1180, y: 1360, width: 260, height: 220), accessibilityLabel: "Target 3"),
-            PageTarget(imageName: "thumb_4", hitRect: CGRect(x: 1600, y: 820,  width: 240, height: 240), accessibilityLabel: "Target 4"),
-            PageTarget(imageName: "thumb_5", hitRect: CGRect(x: 2020, y: 1200, width: 260, height: 220), accessibilityLabel: "Target 5"),
-            PageTarget(imageName: "thumb_6", hitRect: CGRect(x: 2440, y: 940,  width: 240, height: 240), accessibilityLabel: "Target 6"),
-            PageTarget(imageName: "thumb_7", hitRect: CGRect(x: 2860, y: 1480, width: 260, height: 220), accessibilityLabel: "Target 7"),
-            PageTarget(imageName: "thumb_8", hitRect: CGRect(x: 3180, y: 760,  width: 240, height: 240), accessibilityLabel: "Target 8"),
-            PageTarget(imageName: "thumb_9", hitRect: CGRect(x: 3400, y: 1260, width: 260, height: 220), accessibilityLabel: "Target 9"),
-            PageTarget(imageName: "thumb_10",hitRect: CGRect(x: 3600, y: 880,  width: 220, height: 220), accessibilityLabel: "Target 10")
+            PageTarget(
+                imageName: "thumb_bear",
+                // left ~6%, top ~69%, width ~15%, height ~28%
+                hitRect: pxRect(0.060, 0.690, 0.150, 0.280),
+                accessibilityLabel: "Bear"
+            ),
+            PageTarget(
+                imageName: "thumb_bird",
+                // left ~26%, top ~69%, width ~14%, height ~28%
+                hitRect: pxRect(0.260, 0.690, 0.150, 0.280),
+                accessibilityLabel: "Bird"
+            ),
+            PageTarget(
+                imageName: "thumb_penguin",
+                // left ~46.5%, top ~67%, width ~14.5%, height ~30%
+                hitRect: pxRect(0.40, 0.690, 0.150, 0.280),
+                accessibilityLabel: "Penguin"
+            ),
+            PageTarget(
+                imageName: "thumb_lion",
+                // left ~62.5%, top ~66.5%, width ~15%, height ~30%
+                hitRect: pxRect(0.54, 0.69, 0.150, 0.280),
+                accessibilityLabel: "Lion"
+            ),
+            PageTarget(
+                imageName: "thumb_monkey",
+                // left ~78.5%, top ~65.5%, width ~14%, height ~31%
+                hitRect: pxRect(0.64, 0.69, 0.150, 0.280),
+                accessibilityLabel: "Monkey"
+            ),
+            PageTarget(
+                imageName: "thumb_rabbit",
+                // left ~90.7%, top ~68%, width ~8.8%, height ~27%
+                hitRect: pxRect(0.84, 0.690, 0.15, 0.280),
+                accessibilityLabel: "Rabbit"
+            )
         ]
 
-        let example = PageLevel(
-            sceneImageName: "sample_scene_art", // replace with your real art asset
+        let level = PageLevel(
+            sceneImageName: "animals_wallpaper", // your asset name
             sceneImageSize: sceneSize,
             targets: targets
         )
 
-        selectedLevel = example
+        selectedLevel = level
         openPage = true
     }
 }
