@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftUI
 
 struct BookView: View {
     let bookTitle: String
@@ -41,7 +42,7 @@ struct BookView: View {
                         // Open PageView only for non-locked pages
                         .onTapGesture {
                             guard status != .locked else { return }
-                            openAnimalsLevel() // uses Animals-05 + 6 targets
+                            openAnimalsLevel() // uses test_animals + 6 targets
                         }
                         .pressToScale { pressing in pressedIndex = pressing ? i : nil }
                         .bobbing(
@@ -118,63 +119,63 @@ struct BookView: View {
         }
     }
 
-    // MARK: - Level using animals_wallpaper (1664 × 768) with refined hit boxes
+    // MARK: - Level using test_animals (1664 × 768) with refined hit boxes
     private func openAnimalsLevel() {
-        // Exact pixel size of the asset in your xcassets
+        // Exact pixel size of your asset
         let sceneSize = CGSize(width: 1664, height: 768)
 
-        // Helper to convert percentage-based rects (0...1) into pixel-space rects
+        // Helper: percentages (0...1) → pixel rects
         func pxRect(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat) -> CGRect {
-            return CGRect(x: x * sceneSize.width,
-                          y: y * sceneSize.height,
-                          width:  w * sceneSize.width,
-                          height: h * sceneSize.height)
+            CGRect(x: x * sceneSize.width,
+                   y: y * sceneSize.height,
+                   width:  w * sceneSize.width,
+                   height: h * sceneSize.height)
         }
 
-        // Bear → Bird → Penguin → Lion → Monkey → Rabbit
-        // Percentages are measured in ORIGINAL image space (top-left origin).
-        // These are generous kid-friendly boxes aligned to your Animals-05 layout.
+        // Order expected by your game: Bear → Bird → Penguin → Lion → Monkey → Rabbit
+        // These percentages are tuned for the image you uploaded (top row: lion/penguin/monkey/rabbit; bottom row: bear/bird).
+        // They’re generous for kid-friendly taps; nudge x/y/w/h by ±0.01–0.02 if you want tighter/looser boxes.
         let targets: [PageTarget] = [
+            // BEAR – bottom-left/mid
             PageTarget(
-                imageName: "thumb_bear",
-                // left ~6%, top ~69%, width ~15%, height ~28%
-                hitRect: pxRect(0.060, 0.690, 0.150, 0.280),
+                imageName: "test_bear",
+                hitRect: pxRect(0.230, 0.58, 0.132, 0.339),
                 accessibilityLabel: "Bear"
             ),
+            // BIRD – bottom center
             PageTarget(
-                imageName: "thumb_bird",
-                // left ~26%, top ~69%, width ~14%, height ~28%
-                hitRect: pxRect(0.260, 0.690, 0.150, 0.280),
+                imageName: "test_bird",
+                hitRect: pxRect(0.48, 0.58, 0.132, 0.339),
                 accessibilityLabel: "Bird"
             ),
+            // PENGUIN – upper center
             PageTarget(
-                imageName: "thumb_penguin",
-                // left ~46.5%, top ~67%, width ~14.5%, height ~30%
-                hitRect: pxRect(0.40, 0.690, 0.150, 0.280),
+                imageName: "test_penguin",
+                hitRect: pxRect(0.36, 0.08, 0.132, 0.339),
                 accessibilityLabel: "Penguin"
             ),
+            // LION – upper left
             PageTarget(
-                imageName: "thumb_lion",
-                // left ~62.5%, top ~66.5%, width ~15%, height ~30%
-                hitRect: pxRect(0.54, 0.69, 0.150, 0.280),
+                imageName: "test_lion",
+                hitRect: pxRect(0.087, 0.208, 0.132, 0.339),
                 accessibilityLabel: "Lion"
             ),
+            // MONKEY – upper right-mid
             PageTarget(
-                imageName: "thumb_monkey",
-                // left ~78.5%, top ~65.5%, width ~14%, height ~31%
-                hitRect: pxRect(0.64, 0.69, 0.150, 0.280),
+                imageName: "test_monkey",
+                hitRect: pxRect(0.60, 0.142, 0.132, 0.339),
                 accessibilityLabel: "Monkey"
             ),
+            // RABBIT – far right
             PageTarget(
-                imageName: "thumb_rabbit",
-                // left ~90.7%, top ~68%, width ~8.8%, height ~27%
-                hitRect: pxRect(0.84, 0.690, 0.15, 0.280),
+                imageName: "test_rabbit",
+                hitRect: pxRect(0.859, 0.162, 0.132, 0.339),
                 accessibilityLabel: "Rabbit"
             )
         ]
 
         let level = PageLevel(
-            sceneImageName: "animals_wallpaper", // your asset name
+            sceneImageName: "test_animals", // your full-background asset
             sceneImageSize: sceneSize,
             targets: targets
         )
