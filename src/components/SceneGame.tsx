@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   markerText: { fontSize: 30, color: '#22a06b', fontWeight: '900' },
   winScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(13,22,43,0.45)',
