@@ -5,10 +5,11 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  Vibration,
   View,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import type { Level } from '../data/levels';
+import { HitboxAuthor } from '../dev/HitboxAuthor';
 
 type Props = {
   level: Level;
@@ -41,12 +42,17 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
   const [found, setFound] = useState(0);
   const [marker, setMarker] = useState<Point | null>(null);
   const [won, setWon] = useState(false);
+  const [authoring, setAuthoring] = useState(false);
 
   const target = level.targets[Math.min(currentIndex, level.targets.length - 1)];
   const stars = useMemo(
     () => level.targets.map((_, index) => (index < found ? '★' : '☆')).join(' '),
     [found, level.targets],
   );
+
+  if (__DEV__ && authoring) {
+    return <HitboxAuthor level={level} onExit={() => setAuthoring(false)} />;
+  }
 
   function reset() {
     setCurrentIndex(0);
@@ -78,11 +84,10 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
       imagePoint.y <= rect.y + rect.height;
 
     if (!hit) {
-      Vibration.vibrate(35);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
       return;
     }
 
-    Vibration.vibrate(15);
     setMarker({ x, y });
     setTimeout(() => setMarker(null), 650);
 
@@ -90,9 +95,11 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
     setFound(nextFound);
 
     if (nextFound >= level.targets.length) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setWon(true);
       onComplete?.(level.id);
     } else {
+      void Haptics.selectionAsync();
       setCurrentIndex(currentIndex + 1);
     }
   }
@@ -100,6 +107,8 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
   return (
     <View style={styles.root} onLayout={handleLayout}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={target ? `Find ${target.label}` : 'Hidden object scene'}
         style={StyleSheet.absoluteFill}
         onPress={(event) =>
           handlePress(event.nativeEvent.locationX, event.nativeEvent.locationY)
@@ -108,11 +117,23 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
         <Image source={level.scene} style={styles.scene} resizeMode="cover" />
       </Pressable>
 
-      <Pressable style={styles.backButton} onPress={onExit}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Back" style={styles.backButton} onPress={onExit}>
         <Text style={styles.backText}>‹ Back</Text>
       </Pressable>
 
+      {__DEV__ ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open hitbox authoring tool"
+          style={styles.authorButton}
+          onPress={() => setAuthoring(true)}
+        >
+          <Text style={styles.authorButtonText}>Hitboxes</Text>
+        </Pressable>
+      ) : null}
+
       <View style={styles.starMeter} pointerEvents="none">
+        <Text style={styles.progressText}>{found}/{level.targets.length}</Text>
         <Text style={styles.starText}>{stars}</Text>
       </View>
 
@@ -138,7 +159,7 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
           <View style={styles.winCard}>
             <Text style={styles.sparkles}>✨</Text>
             <Text style={styles.winTitle}>Great job!</Text>
-            <Text style={styles.winBody}>You found them all!</Text>
+            <Text style={styles.winBody}>You found all {level.targets.length}!</Text>
             <View style={styles.winActions}>
               <Pressable style={styles.secondaryButton} onPress={reset}>
                 <Text style={styles.secondaryButtonText}>Play again</Text>
@@ -167,15 +188,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,34,79,0.92)',
   },
   backText: { color: 'white', fontWeight: '800', fontSize: 18 },
+  authorButton: {
+    position: 'absolute',
+    top: 18,
+    left: 126,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+    backgroundColor: 'rgba(17,24,39,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(250,204,21,0.7)',
+  },
+  authorButtonText: { color: '#facc15', fontWeight: '900', fontSize: 12 },
   starMeter: {
     position: 'absolute',
     top: 18,
     right: 22,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 9,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    alignItems: 'center',
   },
+  progressText: { color: '#344054', fontWeight: '900', fontSize: 12, marginBottom: 1 },
   starText: { color: '#f59e0b', fontWeight: '900', fontSize: 18 },
   targetCard: {
     position: 'absolute',

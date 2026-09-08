@@ -6,12 +6,13 @@ iFind is a landscape-first hidden-object game for young kids. The child chooses 
 
 ## Current stack
 
-- Expo SDK 54
-- React Native
-- React
+- Expo SDK 57
+- React Native 0.86
+- React 19.2
 - TypeScript
+- AsyncStorage for local progress and preferences
 - VS Code-first development
-- Expo Go on a physical iPhone is the preferred zero-Xcode preview path during Phase 0.
+- Expo Go on a physical iPhone is the preferred preview path during revival
 
 ## Product rules
 
@@ -20,11 +21,28 @@ iFind is a landscape-first hidden-object game for young kids. The child chooses 
 3. Hidden-object levels must be data-driven. Do not hard-code hit testing into screen components.
 4. Preserve original iFind art whenever practical.
 5. Do not delete the legacy Swift project during revival. It is reference material for behavior and assets.
-6. Phase 0 is about a clean playable baseline, not StoreKit, accounts, analytics, or production polish.
-7. Prefer small reusable components and plain React Native APIs before adding dependencies.
+6. Prefer small reusable components and plain React Native/Expo APIs before adding dependencies.
+7. Progress and parent preferences must survive app relaunches.
+8. Adding a new page should be primarily a content task. See `docs/CONTENT_AUTHORING.md`.
 
-## Phase 0 definition of done
+## Current phase
 
-Splash -> Dashboard -> Bookshelf -> Animals -> Page 1 -> playable six-target hidden-object level -> completion state.
+Phase 0 is complete. The active development branch is Phase 1: core experience.
+
+Phase 1 priorities:
+- improve game feel and child feedback
+- improve content-authoring ergonomics
+- preserve and clarify progress/unlock behavior
+- clean up oversized screen code as features stabilize
+- keep StoreKit, accounts, analytics, and release polish out until the core experience is solid
+
+## Validation
+
+Before considering a change ready:
+
+```bash
+npm run typecheck
+npm run doctor
+```
 
 The app should run from the repository root with `npm install` then `npm start`.
