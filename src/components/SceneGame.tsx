@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import type { Level } from '../data/levels';
+import { HitboxAuthor } from '../dev/HitboxAuthor';
 
 type Props = {
   level: Level;
@@ -41,12 +42,17 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
   const [found, setFound] = useState(0);
   const [marker, setMarker] = useState<Point | null>(null);
   const [won, setWon] = useState(false);
+  const [authoring, setAuthoring] = useState(false);
 
   const target = level.targets[Math.min(currentIndex, level.targets.length - 1)];
   const stars = useMemo(
     () => level.targets.map((_, index) => (index < found ? '★' : '☆')).join(' '),
     [found, level.targets],
   );
+
+  if (__DEV__ && authoring) {
+    return <HitboxAuthor level={level} onExit={() => setAuthoring(false)} />;
+  }
 
   function reset() {
     setCurrentIndex(0);
@@ -115,6 +121,17 @@ export function SceneGame({ level, onExit, onComplete }: Props) {
         <Text style={styles.backText}>‹ Back</Text>
       </Pressable>
 
+      {__DEV__ ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open hitbox authoring tool"
+          style={styles.authorButton}
+          onPress={() => setAuthoring(true)}
+        >
+          <Text style={styles.authorButtonText}>Hitboxes</Text>
+        </Pressable>
+      ) : null}
+
       <View style={styles.starMeter} pointerEvents="none">
         <Text style={styles.progressText}>{found}/{level.targets.length}</Text>
         <Text style={styles.starText}>{stars}</Text>
@@ -171,6 +188,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,34,79,0.92)',
   },
   backText: { color: 'white', fontWeight: '800', fontSize: 18 },
+  authorButton: {
+    position: 'absolute',
+    top: 18,
+    left: 126,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+    backgroundColor: 'rgba(17,24,39,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(250,204,21,0.7)',
+  },
+  authorButtonText: { color: '#facc15', fontWeight: '900', fontSize: 12 },
   starMeter: {
     position: 'absolute',
     top: 18,
