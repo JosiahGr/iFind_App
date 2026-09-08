@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "iFind",
+    "slug": "ifind",
+    "version": "0.1.0",
+    "orientation": "landscape",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.josiahgreen.ifind"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
