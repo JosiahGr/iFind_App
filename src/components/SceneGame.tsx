@@ -13,6 +13,7 @@ import type { Level } from '../data/levels';
 type Props = {
   level: Level;
   onExit: () => void;
+  onComplete?: (levelId: string) => void;
 };
 
 type Size = { width: number; height: number };
@@ -34,7 +35,7 @@ function mapTouchToImage(point: Point, container: Size, level: Level): Point {
   };
 }
 
-export function SceneGame({ level, onExit }: Props) {
+export function SceneGame({ level, onExit, onComplete }: Props) {
   const [size, setSize] = useState<Size>({ width: 1, height: 1 });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [found, setFound] = useState(0);
@@ -90,6 +91,7 @@ export function SceneGame({ level, onExit }: Props) {
 
     if (nextFound >= level.targets.length) {
       setWon(true);
+      onComplete?.(level.id);
     } else {
       setCurrentIndex(currentIndex + 1);
     }
@@ -123,7 +125,10 @@ export function SceneGame({ level, onExit }: Props) {
       ) : null}
 
       {marker ? (
-        <View style={[styles.marker, { left: marker.x - 24, top: marker.y - 24 }]} pointerEvents="none">
+        <View
+          style={[styles.marker, { left: marker.x - 24, top: marker.y - 24 }]}
+          pointerEvents="none"
+        >
           <Text style={styles.markerText}>✓</Text>
         </View>
       ) : null}
@@ -136,7 +141,7 @@ export function SceneGame({ level, onExit }: Props) {
             <Text style={styles.winBody}>You found them all!</Text>
             <View style={styles.winActions}>
               <Pressable style={styles.secondaryButton} onPress={reset}>
-                <Text style={styles.secondaryButtonText}>Restart</Text>
+                <Text style={styles.secondaryButtonText}>Play again</Text>
               </Pressable>
               <Pressable style={styles.primaryButton} onPress={onExit}>
                 <Text style={styles.primaryButtonText}>Continue</Text>
@@ -186,7 +191,12 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
   },
-  findLabel: { fontSize: 12, fontWeight: '800', color: '#667085', textTransform: 'uppercase' },
+  findLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#667085',
+    textTransform: 'uppercase',
+  },
   targetImage: { width: 86, height: 72, marginVertical: 2 },
   targetLabel: { fontSize: 16, fontWeight: '900', color: '#172036' },
   marker: {
@@ -213,11 +223,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sparkles: { fontSize: 44 },
-  winTitle: { fontSize: 38, fontWeight: '900', color: '#172036', marginTop: 4 },
+  winTitle: {
+    fontSize: 38,
+    fontWeight: '900',
+    color: '#172036',
+    marginTop: 4,
+  },
   winBody: { fontSize: 18, color: '#667085', marginTop: 4 },
   winActions: { flexDirection: 'row', gap: 14, marginTop: 22 },
-  primaryButton: { paddingHorizontal: 24, paddingVertical: 13, borderRadius: 999, backgroundColor: '#f59e0b' },
+  primaryButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 13,
+    borderRadius: 999,
+    backgroundColor: '#f59e0b',
+  },
   primaryButtonText: { color: 'white', fontWeight: '900', fontSize: 17 },
-  secondaryButton: { paddingHorizontal: 24, paddingVertical: 13, borderRadius: 999, backgroundColor: '#e9edf5' },
+  secondaryButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 13,
+    borderRadius: 999,
+    backgroundColor: '#e9edf5',
+  },
   secondaryButtonText: { color: '#172036', fontWeight: '900', fontSize: 17 },
 });
