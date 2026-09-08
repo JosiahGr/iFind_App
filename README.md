@@ -21,7 +21,7 @@ Then:
 - Press `w` for a browser preview.
 - Press `i` for iOS Simulator if Apple Simulator tooling is installed on the Mac.
 
-Expo SDK 54 is intentional for this first revival pass because the current Expo transition guidance recommends SDK 54 when Expo Go on a physical iPhone is required.
+Phase 0 now targets Expo SDK 57 to match the current Expo Go requirement on the test iPhone.
 
 ## Phase 0 scope
 
